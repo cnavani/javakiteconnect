@@ -25,7 +25,8 @@ public class KiteRequestHandler {
      * @param proxy to be set for making requests.*/
     public KiteRequestHandler(Proxy proxy) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(10000, TimeUnit.MILLISECONDS);
+        System.out.println("Using Plutus Kite with 25s timeout");
+        builder.connectTimeout(25000, TimeUnit.MILLISECONDS);
         if(proxy != null) {
             builder.proxy(proxy);
         }
