@@ -260,7 +260,7 @@ public class KiteConnect {
     }
 
     /** Get margins required data before placing an order.
-     * @return MarginCalculationData object, it contains the total, var, exposure, span and other components of the margin required.
+     * @return MarginCalculationData list contains the total, var, exposure, span and other components of the margin required.
      * @throws KiteException is thrown for all Kite trade related errors.
      * @throws JSONException is thrown when there is exception while parsing response.
      * @throws IOException is thrown when there is connection error.
@@ -321,6 +321,33 @@ public class KiteConnect {
         return gson.fromJson(String.valueOf(response.get("data")), CombinedMarginData.class);
     }
 
+    /** A virtual contract provides detailed charges order-wise for brokerage, STT, stamp duty, exchange transaction charges, SEBI turnover charge, and GST.
+     * @return ContractNote list contains the data and charges for all the orders passed as input.
+     * @throws KiteException is thrown for all Kite trade related errors.
+     * @throws JSONException is thrown when there is exception while parsing response.
+     * @throws IOException is thrown when there is connection error.
+     * */
+    public List<ContractNote> getVirtualContractNote(List<ContractNoteParams> params) throws IOException, KiteException, JSONException {
+        String url = routes.get("contractnote");
+        JSONArray jsonArray = new JSONArray();
+        for(int k = 0; k < params.size(); k++){
+            JSONObject jsonObject = new JSONObject();
+            ContractNoteParams param = params.get(k);
+            jsonObject.put("tradingsymbol", param.tradingSymbol);
+            jsonObject.put("exchange", param.exchange);
+            jsonObject.put("order_id", param.orderID);
+            jsonObject.put("transaction_type", param.transactionType);
+            jsonObject.put("product", param.product);
+            jsonObject.put("variety", param.variety);
+            jsonObject.put("order_type", param.orderType);
+            jsonObject.put("quantity", param.quantity);
+            jsonObject.put("average_price", param.averagePrice);
+            jsonArray.put(jsonObject);
+        }
+        JSONObject response = kiteRequestHandler.postRequestJSON(url, jsonArray, new HashMap<String, Object>(), apiKey, accessToken);
+        return Arrays.asList(gson.fromJson(String.valueOf(response.get("data")), ContractNote[].class));
+    }
+
     /**
      * Places an order.
      * @param orderParams is Order params.
@@ -354,6 +381,9 @@ public class KiteConnect {
         if(variety.equals(Constants.VARIETY_ICEBERG)){
          params.put("iceberg_legs", orderParams.icebergLegs);
          params.put("iceberg_quantity", orderParams.icebergQuantity);
+        }
+        if(variety.equals(Constants.VARIETY_AUCTION)){
+            params.put("auction_number", orderParams.auctionNumber);
         }
 
         JSONObject jsonObject = kiteRequestHandler.postRequest(url, params, apiKey, accessToken);
@@ -449,6 +479,18 @@ public class KiteConnect {
         String url = routes.get("orders");
         JSONObject response = kiteRequestHandler.getRequest(url, apiKey, accessToken);
         return Arrays.asList(gson.fromJson(String.valueOf(response.get("data")), Order[].class));
+    }
+
+    /** Fetches collection of auction instruments available for bidding.
+     * @return List of Auction Instruments.
+     * @throws KiteException is thrown for all Kite trade related errors.
+     * @throws JSONException is thrown when there is exception while parsing response.
+     * @throws IOException is thrown when there is connection error.
+     * */
+    public List<AuctionInstrument> getAuctionInstruments() throws KiteException, JSONException, IOException{
+        String url = routes.get("portfolio.auctions.instruments");
+        JSONObject response = kiteRequestHandler.getRequest(url, apiKey, accessToken);
+        return Arrays.asList(gson.fromJson(String.valueOf(response.get("data")), AuctionInstrument[].class));
     }
 
     /** Fetches list of gtt existing in an account.

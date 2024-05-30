@@ -55,7 +55,9 @@ public class KiteRequestHandler {
         Request request = createGetRequest(url, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Makes a GET request.
@@ -71,7 +73,9 @@ public class KiteRequestHandler {
         Request request = createGetRequest(url, params, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Makes a POST request.
@@ -87,7 +91,9 @@ public class KiteRequestHandler {
         Request request = createPostRequest(url, params, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Make a JSON POST request.
@@ -103,7 +109,9 @@ public class KiteRequestHandler {
         Request request = createJsonPostRequest(url, jsonArray, queryParams, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return  new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Makes a PUT request.
@@ -119,7 +127,9 @@ public class KiteRequestHandler {
         Request request = createPutRequest(url, params, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Makes a DELETE request.
@@ -135,7 +145,9 @@ public class KiteRequestHandler {
         Request request = createDeleteRequest(url, params, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Makes a GET request.
@@ -153,7 +165,9 @@ public class KiteRequestHandler {
         Request request = createGetRequest(url, commonKey, values, apiKey, accessToken);
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body);
+        JSONObject json = new KiteResponseHandler().handle(response, body);
+        response.close();
+        return json;
     }
 
     /** Makes GET request to fetch CSV dump.
@@ -168,7 +182,9 @@ public class KiteRequestHandler {
         Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).header("X-Kite-Version", "3").header("Authorization", "token "+apiKey+":"+accessToken).build();
         Response response = client.newCall(request).execute();
         String body = response.body().string();
-        return new KiteResponseHandler().handle(response, body, "csv");
+        String data = new KiteResponseHandler().handle(response, body, "csv");
+        response.close();
+        return data;
     }
 
     /** Creates a GET request.

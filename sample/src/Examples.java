@@ -43,10 +43,12 @@ public class Examples {
         param.quantity = 1;
         param.product = "MIS";
         param.variety = "regular";
+        param.transactionType = Constants.TRANSACTION_TYPE_BUY;
         List<MarginCalculationParams> params = new ArrayList<>();
         params.add(param);
         List<MarginCalculationData> data = kiteConnect.getMarginCalculation(params);
         System.out.println(data.get(0).total);
+        System.out.println(data.get(0).leverage);
     }
 
     public void getCombinedMarginCalculation(KiteConnect kiteConnect) throws IOException, KiteException{
@@ -77,6 +79,27 @@ public class Examples {
 
         CombinedMarginData combinedMarginData = kiteConnect.getCombinedMarginCalculation(params, true, false);
         System.out.println(combinedMarginData.initialMargin.total);
+    }
+
+    /**Get virtual contract note.*/
+    public void getVirtualContractNote(KiteConnect kiteConnect) throws  KiteException, IOException {
+        List<ContractNoteParams> virtualContractNoteParams = new ArrayList<ContractNoteParams>();
+        ContractNoteParams contractNoteParams = new ContractNoteParams();
+        contractNoteParams.orderID = "230727202226518";
+        contractNoteParams.tradingSymbol = "ITC";
+        contractNoteParams.exchange = Constants.EXCHANGE_NSE;
+        contractNoteParams.product = Constants.PRODUCT_CNC;
+        contractNoteParams.orderType = Constants.ORDER_TYPE_MARKET;
+        contractNoteParams.variety = Constants.VARIETY_REGULAR;
+        contractNoteParams.transactionType = Constants.TRANSACTION_TYPE_SELL;
+        contractNoteParams.quantity = 1;
+        contractNoteParams.averagePrice = 470.05;
+        virtualContractNoteParams.add(contractNoteParams);
+
+        List<ContractNote> data = kiteConnect.getVirtualContractNote(virtualContractNoteParams);
+        System.out.println(data.size());
+
+        System.out.println(data.get(0).charges.total);
     }
 
     /**Place order.*/
@@ -168,6 +191,29 @@ public class Examples {
         System.out.println(triggerRangeMap.get("BSE:INFY").percentage);
     }
 
+    /** Get ongoing auction instruments available for the day and it usually starts at 2 PM on a trading day.*/
+    public void getAuctionInstruments(KiteConnect kiteConnect) throws KiteException, IOException{
+        List<AuctionInstrument> auctions = kiteConnect.getAuctionInstruments();
+        for (int i =0; i< auctions.size(); i++){
+            System.out.println(auctions.get(i).tradingSymbol+" "+auctions.get(i).quantity);
+        }
+    }
+
+    /** Place an auction order. Only sell is allowed.*/
+    public void placeAuctionOrder(KiteConnect kiteConnect) throws KiteException, IOException{
+        OrderParams orderParams = new OrderParams();
+        orderParams.price = 365.5;
+        orderParams.quantity = 1;
+        orderParams.transactionType = Constants.TRANSACTION_TYPE_SELL;
+        orderParams.orderType = Constants.ORDER_TYPE_LIMIT;
+        orderParams.tradingsymbol = "ITC";
+        orderParams.exchange = Constants.EXCHANGE_NSE;
+        orderParams.validity = Constants.VALIDITY_DAY;
+        orderParams.product = Constants.PRODUCT_CNC;
+        orderParams.auctionNumber= "2559";
+        kiteConnect.placeOrder(orderParams, Constants.VARIETY_AUCTION);
+    }
+
     /** Get orderbook.*/
     public void getOrders(KiteConnect kiteConnect) throws KiteException, IOException {
         // Get orders returns order model which will have list of orders inside, which can be accessed as follows,
@@ -225,56 +271,6 @@ public class Examples {
 
         Order order21 = kiteConnect.modifyOrder("180116000984900", orderParams, Constants.VARIETY_REGULAR);
         System.out.println(order21.orderId);
-    }
-
-    /** Modify first leg bracket order.*/
-    public void modifyFirstLegBo(KiteConnect kiteConnect) throws KiteException, IOException {
-        OrderParams orderParams = new OrderParams();
-        orderParams.quantity = 1;
-        orderParams.price = 31.0;
-        orderParams.transactionType = Constants.TRANSACTION_TYPE_BUY;
-        orderParams.tradingsymbol = "SOUTHBANK";
-        orderParams.exchange = Constants.EXCHANGE_NSE;
-        orderParams.validity = Constants.VALIDITY_DAY;
-        orderParams.product = Constants.PRODUCT_MIS;
-        orderParams.tag = "myTag";
-        orderParams.triggerPrice = 0.0;
-
-        Order order = kiteConnect.modifyOrder("180116000798058", orderParams, Constants.VARIETY_BO);
-        System.out.println(order.orderId);
-    }
-
-    public void modifySecondLegBoSLM(KiteConnect kiteConnect) throws KiteException, IOException {
-
-        OrderParams orderParams = new OrderParams();
-        orderParams.parentOrderId = "180116000798058";
-        orderParams.tradingsymbol = "SOUTHBANK";
-        orderParams.exchange = Constants.EXCHANGE_NSE;
-        orderParams.product = Constants.PRODUCT_MIS;
-        orderParams.validity = Constants.VALIDITY_DAY;
-        orderParams.triggerPrice = 30.5;
-        orderParams.price = 0.0;
-        orderParams.orderType = Constants.ORDER_TYPE_SLM;
-        orderParams.transactionType = Constants.TRANSACTION_TYPE_SELL;
-
-        Order order = kiteConnect.modifyOrder("180116000812154", orderParams, Constants.VARIETY_BO);
-        System.out.println(order.orderId);
-    }
-
-    public void modifySecondLegBoLIMIT(KiteConnect kiteConnect) throws KiteException, IOException {
-        OrderParams orderParams =  new OrderParams();
-        orderParams.parentOrderId = "180116000798058";
-        orderParams.tradingsymbol = "SOUTHBANK";
-        orderParams.exchange = Constants.EXCHANGE_NSE;
-        orderParams.quantity =  1;
-        orderParams.product = Constants.PRODUCT_MIS;
-        orderParams.validity = Constants.VALIDITY_DAY;
-        orderParams.price = 35.3;
-        orderParams.orderType = Constants.ORDER_TYPE_LIMIT;
-        orderParams.transactionType = Constants.TRANSACTION_TYPE_SELL;
-
-        Order order = kiteConnect.modifyOrder("180116000812153", orderParams, Constants.VARIETY_BO);
-        System.out.println(order.orderId);
     }
 
     /** Cancel an order*/

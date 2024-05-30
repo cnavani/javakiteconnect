@@ -74,6 +74,7 @@ public class Routes {
             put("portfolio.positions", "/portfolio/positions");
             put("portfolio.holdings", "/portfolio/holdings");
             put("portfolio.positions.modify", "/portfolio/positions");
+            put("portfolio.auctions.instruments", "/portfolio/holdings/auctions");
 
             put("market.instruments.all", "/instruments");
             put("market.instruments", "/instruments/:exchange");
@@ -102,6 +103,7 @@ public class Routes {
 
             put("margin.calculation.order", "/margins/orders");
             put("margin.calculation.basket", "/margins/basket");
+            put("contractnote", "/charges/orders");
         }};
     }
 
